@@ -99,18 +99,19 @@ class Collision {
         var verts = poly.transformedVertices;
 
         var i:Int = 0;
-        var j:Int = sides - 1;
+        var j:Int = sides - 2;
+        // var j:Int = sides - 1;
         var oddNodes:Bool = false;
 
-        for(i in 0 ... sides) {
+        while(i < sides) {
 
-            if( (verts[i].y < y && verts[j].y >= y) ||
-                (verts[j].y < y && verts[i].y >= y))
+            if( (verts[i+1] < y && verts[j+1] >= y) ||
+                (verts[j+1] < y && verts[i+1] >= y))
             {
-                if( verts[i].x +
-                    (y - verts[i].y) /
-                    (verts[j].y - verts[i].y) *
-                    (verts[j].x - verts[i].x) < x)
+                if( verts[i] +
+                    (y - verts[i+1]) /
+                    (verts[j+1] - verts[i+1]) *
+                    (verts[j] - verts[i]) < x)
                 {
                     oddNodes = !oddNodes;
                 }
@@ -118,7 +119,7 @@ class Collision {
             }
 
             j = i;
-
+            i += 2;
         } //for each side
 
         return oddNodes;

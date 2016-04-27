@@ -10,14 +10,14 @@ class Polygon extends Shape {
 
 
         /** The transformed (rotated/scale) vertices cache */
-    public var transformedVertices ( get, never ) : Array<Vector>;
+    public var transformedVertices ( get, never ) : haxe.ds.Vector<Float>;
         /** The vertices of this shape */
     public var vertices ( get, never ) : Array<Vector>;
 
     var _rotation_radians : Float = 0;
 
     var _transformMatrix : Matrix;
-    var _transformedVertices : Array<Vector>;
+    var _transformedVertices : haxe.ds.Vector<Float>;
     var _vertices : Array<Vector>;
 
 
@@ -28,9 +28,9 @@ class Polygon extends Shape {
 
         name = 'polygon(sides:${vertices.length})';
 
-        _transformedVertices = new Array<Vector>();
+        
         _vertices = vertices;
-
+        _transformedVertices = new haxe.ds.Vector<Float>(Std.int(_vertices.length * 2));
         _transformMatrix = new Matrix();
         _transformMatrix.makeTranslation( _position.x, _position.y );
     } //new
@@ -160,24 +160,23 @@ class Polygon extends Shape {
 
 //Internal
 
-    function get_transformedVertices() : Array<Vector> {
+    function get_transformedVertices() : haxe.ds.Vector<Float> {
 
         if(!_transformed) {
             _transformed = true;
             _transformMatrix.compose( _position, _rotation_radians, _scale );
             
-            var _count : Int = _vertices.length;
+            var _count : Int = _transformedVertices.length;
 
-            if (_transformedVertices.length == _vertices.length) {
-                // Reuse the same transformed verticies.
-                for(i in 0..._count) {
-                    _transformedVertices[i].x = _transformMatrix.transformX(_vertices[i].x, _vertices[i].y);
-                    _transformedVertices[i].y = _transformMatrix.transformY(_vertices[i].x, _vertices[i].y);
-                }
-            } else {
-                for(i in 0..._count) {
-                    _transformedVertices.push( _vertices[i].transform( _transformMatrix ) );
-                }                                
+            // Reuse the same transformed verticies.
+            var i :Int = 0;
+            var vert :Int = 0;
+            while(i < _count) {
+                _transformedVertices[i] = _transformMatrix.transformX(_vertices[vert].x, _vertices[vert].y);
+                _transformedVertices[i+1] = _transformMatrix.transformY(_vertices[vert].x, _vertices[vert].y);
+                trace(_transformedVertices[i] + ", " + _transformedVertices[i+1]);
+                i += 2;
+                vert++;
             }
         }
 

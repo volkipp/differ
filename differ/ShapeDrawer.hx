@@ -32,8 +32,15 @@ class ShapeDrawer {
 
         /** Draw a `Polygon` */
     public function drawPolygon( poly:Polygon ) {
-
-        drawVertList(poly.transformedVertices);
+        // Temp to test.
+        var verts = new Array<Vector>();
+        var i = 0;
+        while (i < poly.transformedVertices.length) {
+            verts.push(new Vector(poly.transformedVertices[i], poly.transformedVertices[i+1]));
+            i+=2;
+        }
+        drawVertList(verts);
+        // drawVertList(poly.transformedVertices);
 
     } //drawPolygon
 

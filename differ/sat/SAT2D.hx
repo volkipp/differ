@@ -21,16 +21,19 @@ class SAT2D {
 
         var testDistance : Float = 0x3FFFFFFF;
         var distance = 0.0, closestX = 0.0, closestY = 0.0;
-        for(i in 0 ... verts.length) {
+        var count :Int = verts.length;
+        var i :Int = 0;
+        while(i < count) {
 
-            distance = vec_lengthsq(circleX - verts[i].x, circleY - verts[i].y);
+            distance = vec_lengthsq(circleX - verts[i], circleY - verts[i+1]);
 
             if(distance < testDistance) {
                 testDistance = distance;
-                closestX = verts[i].x;
-                closestY = verts[i].y;
+                closestX = verts[i];
+                closestY = verts[i+1];
             }
 
+            i += 2;
         } //for
 
         var normalAxisX = closestX - circleX;
@@ -41,13 +44,15 @@ class SAT2D {
 
             //project all its points, 0 outside the loop
         var test = 0.0;
-        var min1 = vec_dot(normalAxisX, normalAxisY, verts[0].x, verts[0].y);
+        var min1 = vec_dot(normalAxisX, normalAxisY, verts[0], verts[1]);
         var max1 = min1;
 
-        for(j in 1 ... verts.length) {
-            test = vec_dot(normalAxisX, normalAxisY, verts[j].x, verts[j].y);
+        var j :Int = 2;
+        while(j < count) {
+            test = vec_dot(normalAxisX, normalAxisY, verts[j], verts[j+1]);
             if(test < min1) min1 = test;
             if(test > max1) max1 = test;
+            j += 2;
         } //each vert
 
             // project the circle
@@ -74,23 +79,26 @@ class SAT2D {
         var closest = Math.abs(distMin);
 
             // find the normal axis for each point and project
-        for(i in 0 ... verts.length) {
+        i = 0;
+        while(i < count) {
 
-            normalAxisX = findNormalAxisX(verts, i);
+            normalAxisX = findNormalAxisX(verts, i); // TODO: Come back to this.
             normalAxisY = findNormalAxisY(verts, i);
             var aLen = vec_length(normalAxisX, normalAxisY);
             normalAxisX = vec_normalize(aLen, normalAxisX);
             normalAxisY = vec_normalize(aLen, normalAxisY);
 
                 // project the polygon(again? yes, circles vs. polygon require more testing...)
-            min1 = vec_dot(normalAxisX, normalAxisY, verts[0].x, verts[0].y);
+            min1 = vec_dot(normalAxisX, normalAxisY, verts[0], verts[1]);
             max1 = min1; //set max and min
 
             //project all the other points(see, cirlces v. polygons use lots of this...)
-            for(j in 1 ... verts.length) {
-                test = vec_dot(normalAxisX, normalAxisY, verts[j].x, verts[j].y);
+            j = 2;
+            while(j < count) {
+                test = vec_dot(normalAxisX, normalAxisY, verts[j], verts[j+1]);
                 if(test < min1) min1 = test;
                 if(test > max1) max1 = test;
+                j += 2;
             }
 
             // project the circle(again)
@@ -121,6 +129,7 @@ class SAT2D {
                 closest = Math.abs(distMin);
             }
 
+            i += 2;
         } //for
 
         //if you made it here, there is a collision!!!!!
@@ -275,32 +284,38 @@ class SAT2D {
         var deltaY = ray.end.y - startY;
 
         var verts = polygon.transformedVertices;
-        var v1 = verts[verts.length - 1];
-        var v2 = verts[0];
+        var v1x = verts[verts.length - 2];
+        var v1y = verts[verts.length - 1];
+        var v2x = verts[0];
+        var v2y = verts[1];
 
-        var ud = (v2.y-v1.y) * deltaX - (v2.x-v1.x) * deltaY;
-        var ua = rayU(ud, startX, startY, v1.x, v1.y, v2.x - v1.x, v2.y - v1.y);
-        var ub = rayU(ud, startX, startY, v1.x, v1.y, deltaX, deltaY);
+        var ud = (v2y-v1y) * deltaX - (v2x-v1x) * deltaY;
+        var ua = rayU(ud, startX, startY, v1x, v1y, v2x - v1x, v2y - v1y);
+        var ub = rayU(ud, startX, startY, v1x, v1y, deltaX, deltaY);
 
         if (ud != 0.0 && ub >= 0.0 && ub <= 1.0) {
             if (ua < min_u) min_u = ua;
             if (ua > max_u) max_u = ua;
         }
 
-        for (i in 1...verts.length) {
+        var i :Int = 2;
+        var count = verts.length;
+        while (i < count) {
 
-            v1 = verts[i - 1];
-            v2 = verts[i];
+            v1x = verts[i - 2];
+            v1y = verts[i - 1];
+            v2x = verts[i];
+            v2y = verts[i + 1];
 
-            ud = (v2.y-v1.y) * deltaX - (v2.x-v1.x) * deltaY;
-            ua = rayU(ud, startX, startY, v1.x, v1.y, v2.x - v1.x, v2.y - v1.y);
-            ub = rayU(ud, startX, startY, v1.x, v1.y, deltaX, deltaY);
+            ud = (v2y-v1y) * deltaX - (v2x-v1x) * deltaY;
+            ua = rayU(ud, startX, startY, v1x, v1y, v2x - v1x, v2y - v1y);
+            ub = rayU(ud, startX, startY, v1x, v1y, deltaX, deltaY);
 
             if (ud != 0.0 && ub >= 0.0 && ub <= 1.0) {
                 if (ua < min_u) min_u = ua;
                 if (ua > max_u) max_u = ua;
             }
-
+            i += 2;
         } //each vert
 
         if(ray.infinite || (min_u <= 1.0 && min_u >= 0.0) ) {
@@ -362,7 +377,9 @@ class SAT2D {
         var verts2 = polygon2.transformedVertices;
 
             // loop to begin projection
-        for(i in 0 ... verts1.length) {
+        var count :Int = verts1.length;
+        var i :Int = 0;
+        while (i < count) {
 
             axisX = findNormalAxisX(verts1, i);
             axisY = findNormalAxisY(verts1, i);
@@ -371,23 +388,28 @@ class SAT2D {
             axisY = vec_normalize(aLen, axisY);
 
                 // project polygon1
-            min1 = vec_dot(axisX, axisY, verts1[0].x, verts1[0].y);
+            min1 = vec_dot(axisX, axisY, verts1[0], verts1[1]);
             max1 = min1;
 
-            for(j in 1 ... verts1.length) {
-                testNum = vec_dot(axisX, axisY, verts1[j].x, verts1[j].y);
+            var j :Int = 2;
+            while(j < count) {
+                testNum = vec_dot(axisX, axisY, verts1[j], verts1[j+1]);
                 if(testNum < min1) min1 = testNum;
                 if(testNum > max1) max1 = testNum;
+                j += 2;
             }
 
                 // project polygon2
-            min2 = vec_dot(axisX, axisY, verts2[0].x, verts2[0].y);
+            min2 = vec_dot(axisX, axisY, verts2[0], verts2[1]);
             max2 = min2;
 
-            for(j in 1 ... verts2.length) {
-                testNum = vec_dot(axisX, axisY, verts2[j].x, verts2[j].y);
+            var count2 = verts2.length;
+            j = 2;
+            while(j < count2) {
+                testNum = vec_dot(axisX, axisY, verts2[j], verts2[j+1]);
                 if(testNum < min2) min2 = testNum;
                 if(testNum > max2) max2 = testNum;
+                j += 2;
             }
 
             test1 = min1 - max2;
@@ -404,7 +426,7 @@ class SAT2D {
                 into.overlap = distMin;
                 closest = Math.abs(distMin);
             }
-
+            i += 2;
         }
 
         into.shape1 = if(flip) polygon2 else polygon1;
@@ -429,14 +451,14 @@ class SAT2D {
         return (dX * (aY - bY) - dY * (aX - bX)) / udelta;
     } //rayU
 
-    static inline function findNormalAxisX(verts:Array<Vector>, index:Int) : Float {
-        var v2 = (index >= verts.length - 1) ? verts[0] : verts[index + 1];
-        return -(v2.y - verts[index].y);
+    static inline function findNormalAxisX(verts:haxe.ds.Vector<Float>, index:Int) : Float {
+        var v2 = (index >= verts.length - 2) ? verts[1] : verts[index + 2];
+        return -(v2 - verts[index+1]);
     }
 
-    static inline function findNormalAxisY(verts:Array<Vector>, index:Int) : Float {
-        var v2 = (index >= verts.length - 1) ? verts[0] : verts[index + 1];
-        return (v2.x - verts[index].x);
+    static inline function findNormalAxisY(verts:haxe.ds.Vector<Float>, index:Int) : Float {
+        var v2 = (index >= verts.length - 2) ? verts[0] : verts[index + 1];
+        return (v2 - verts[index]);
     }
 
 } //SAT2D
