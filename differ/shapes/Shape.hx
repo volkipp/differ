@@ -31,15 +31,10 @@ class Shape {
 
     var _position : Vector;
     var _rotation : Float = 0;
-    var _rotation_radians : Float = 0;
     var _scale : Vector;
 
     var _scaleX : Float = 1;
     var _scaleY : Float = 1;
-
-    var _transformed : Bool = false;
-    var _transformMatrix : Matrix;
-
 
 //Public API
 
@@ -55,9 +50,6 @@ class Shape {
 
         _scaleX = 1;
         _scaleY = 1;
-
-        _transformMatrix = new Matrix();
-        _transformMatrix.makeTranslation( _position.x, _position.y );
 
     } //new
 
@@ -77,17 +69,13 @@ class Shape {
 
         _position = null;
         _scale = null;
-        _transformMatrix = null;
 
     } //destroy
 
 //Getters/Setters
 
     function refresh_transform() {
-
-        _transformMatrix.compose( _position, _rotation_radians, _scale );
-        _transformed = false;
-
+        // Override in subclasses
     }
 
 //.position
@@ -133,13 +121,8 @@ class Shape {
     }
 
     function set_rotation( v : Float ) : Float {
-
-        _rotation_radians = v * (Math.PI / 180);
-
         refresh_transform();
-
         return _rotation = v;
-
     } //set_rotation
 
 //.scaleX

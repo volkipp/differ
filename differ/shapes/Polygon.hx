@@ -14,6 +14,12 @@ class Polygon extends Shape {
         /** The vertices of this shape */
     public var vertices ( get, never ) : Array<Vector>;
 
+    var _rotation_radians : Float = 0;
+
+    var _transformed : Bool = false;
+    var _transformMatrix : Matrix;
+
+
     var _transformedVertices : Array<Vector>;
     var _vertices : Array<Vector>;
 
@@ -28,6 +34,8 @@ class Polygon extends Shape {
         _transformedVertices = new Array<Vector>();
         _vertices = vertices;
 
+        _transformMatrix = new Matrix();
+        _transformMatrix.makeTranslation( _position.x, _position.y );
     } //new
 
         /** Test for a collision with a shape. */
@@ -58,6 +66,23 @@ class Polygon extends Shape {
 
     } //testRay
 
+    override function refresh_transform() {
+
+        _transformMatrix.compose( _position, _rotation_radians, _scale );
+        _transformed = false;
+
+    }
+
+    override function set_rotation( v : Float ) : Float {
+
+        _rotation_radians = v * (Math.PI / 180);
+
+        refresh_transform();
+
+        return _rotation = v;
+
+    } //set_rotation
+
         /** Destroy this polygon and clean up. */
     override public function destroy() : Void {
 
@@ -68,6 +93,7 @@ class Polygon extends Shape {
         }
 
         _transformedVertices = null;
+        _transformMatrix = null;
         _vertices = null;
 
         super.destroy();
