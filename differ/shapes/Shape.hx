@@ -35,6 +35,7 @@ class Shape {
 
     var _scaleX : Float = 1;
     var _scaleY : Float = 1;
+    var _transformed : Bool = false;
 
 //Public API
 
@@ -74,10 +75,6 @@ class Shape {
 
 //Getters/Setters
 
-    function refresh_transform() {
-        // Override in subclasses
-    }
-
 //.position
 
     function get_position() : Vector {
@@ -86,7 +83,7 @@ class Shape {
 
     function set_position( v : Vector ) : Vector {
         _position = v;
-        refresh_transform();
+        _transformed = false;
         return _position;
     }
 
@@ -98,7 +95,7 @@ class Shape {
 
     function set_x(x : Float) : Float {
         _position.x = x;
-        refresh_transform();
+        _transformed = false;
         return _position.x;
     }
 
@@ -110,7 +107,7 @@ class Shape {
 
     function set_y(y : Float) : Float {
         _position.y = y;
-        refresh_transform();
+        _transformed = false;
         return _position.y;
     }
 
@@ -121,7 +118,7 @@ class Shape {
     }
 
     function set_rotation( v : Float ) : Float {
-        refresh_transform();
+        _transformed = false;
         return _rotation = v;
     } //set_rotation
 
@@ -134,7 +131,7 @@ class Shape {
     function set_scaleX( scale : Float ) : Float {
         _scaleX = scale;
         _scale.x = _scaleX;
-        refresh_transform();
+        _transformed = false;
         return _scaleX;
     }
 
@@ -147,7 +144,7 @@ class Shape {
     function set_scaleY(scale:Float) : Float {
         _scaleY = scale;
         _scale.y = _scaleY;
-        refresh_transform();
+        _transformed = false;
         return _scaleY;
     }
 

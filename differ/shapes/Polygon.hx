@@ -16,10 +16,7 @@ class Polygon extends Shape {
 
     var _rotation_radians : Float = 0;
 
-    var _transformed : Bool = false;
     var _transformMatrix : Matrix;
-
-
     var _transformedVertices : Array<Vector>;
     var _vertices : Array<Vector>;
 
@@ -66,18 +63,10 @@ class Polygon extends Shape {
 
     } //testRay
 
-    override function refresh_transform() {
-
-        _transformMatrix.compose( _position, _rotation_radians, _scale );
-        _transformed = false;
-
-    }
-
     override function set_rotation( v : Float ) : Float {
 
         _rotation_radians = v * (Math.PI / 180);
-
-        refresh_transform();
+        _transformed = false;
 
         return _rotation = v;
 
@@ -175,7 +164,8 @@ class Polygon extends Shape {
 
         if(!_transformed) {
             _transformed = true;
-
+            _transformMatrix.compose( _position, _rotation_radians, _scale );
+            
             var _count : Int = _vertices.length;
 
             if (_transformedVertices.length == _vertices.length) {
