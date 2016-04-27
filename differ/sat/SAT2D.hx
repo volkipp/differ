@@ -452,12 +452,12 @@ class SAT2D {
     } //rayU
 
     static inline function findNormalAxisX(verts:haxe.ds.Vector<Float>, index:Int) : Float {
-        var v2 = (index >= verts.length - 2) ? verts[1] : verts[index + 2];
+        var v2 = (index >= verts.length - 3) ? verts[1] : verts[index + 3];
         return -(v2 - verts[index+1]);
     }
 
     static inline function findNormalAxisY(verts:haxe.ds.Vector<Float>, index:Int) : Float {
-        var v2 = (index >= verts.length - 2) ? verts[0] : verts[index + 1];
+        var v2 = (index >= verts.length - 3) ? verts[0] : verts[index + 2];
         return (v2 - verts[index]);
     }
 
