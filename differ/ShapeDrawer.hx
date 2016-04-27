@@ -32,15 +32,7 @@ class ShapeDrawer {
 
         /** Draw a `Polygon` */
     public function drawPolygon( poly:Polygon ) {
-        // Temp to test.
-        var verts = new Array<Vector>();
-        var i = 0;
-        while (i < poly.transformedVertices.length) {
-            verts.push(new Vector(poly.transformedVertices[i], poly.transformedVertices[i+1]));
-            i+=2;
-        }
-        drawVertList(verts);
-        // drawVertList(poly.transformedVertices);
+        drawVertList(poly.transformedVertices);
 
     } //drawPolygon
 
@@ -61,14 +53,13 @@ class ShapeDrawer {
         var x : Float = circle.transformedRadius;
         var y : Float = 0;
 
-        var _verts : Array<Vector> = [];
+        var count = Std.int(_steps*2);
+        var _verts : haxe.ds.Vector<Float> = new haxe.ds.Vector<Float>(count);
+        var i :Int = 0;
+        while( i < count ) {
 
-        for( i in 0 ... _steps ) {
-
-            var __x = x + circle.x;
-            var __y = y + circle.y;
-
-            _verts.push(new Vector(__x,__y));
+            _verts[i] = x + circle.x;
+            _verts[i+1] = y + circle.y;
 
                 var tx = -y;
                 var ty = x;
@@ -79,6 +70,7 @@ class ShapeDrawer {
                 x *= radial_factor;
                 y *= radial_factor;
 
+            i += 2;
         } //for
 
             //now draw it
@@ -130,29 +122,31 @@ class ShapeDrawer {
 
 
         /** Draw a list of points as lines */
-    function drawVertList( _verts : Array<Vector> ) {
+    function drawVertList( _verts : haxe.ds.Vector<Float> ) {
 
         var _count : Int = _verts.length;
 
-        if(_count == 2) {
-            drawLine(_verts[0].x, _verts[0].y, _verts[1].x, _verts[1].y, true);
+        if(_count == 4) {
+            drawLine(_verts[0], _verts[1], _verts[2], _verts[3], true);
             return;
         }
 
-        if(_count == 1) {
-            drawPoint(_verts[0].x, _verts[0].y);
+        if(_count == 2) {
+            drawPoint(_verts[0], _verts[1]);
             return;
         }
 
             //start the polygon by drawing this start point
-        drawLine(_verts[0].x, _verts[0].y, _verts[1].x, _verts[1].y, true);
+        drawLine(_verts[0], _verts[1], _verts[2], _verts[3], true);
 
             //draw the rest of the points
-        for(i in 1 ... _count-1) {
-            drawLine(_verts[i].x, _verts[i].y, _verts[i+1].x, _verts[i+1].y, false);
+        var c = 2;
+        while(c < _count-2) {
+            drawLine(_verts[c], _verts[c+1], _verts[c+2], _verts[c+3], false);
+            c += 2;
         }
             //join last point to first point
-        drawLine(_verts[_count-1].x, _verts[_count-1].y, _verts[0].x, _verts[0].y, false);
+        drawLine(_verts[_verts.length-2], _verts[_verts.length-1], _verts[0], _verts[1], false);
 
     } //drawVertList
 
