@@ -148,13 +148,20 @@ class Polygon extends Shape {
     function get_transformedVertices() : Array<Vector> {
 
         if(!_transformed) {
-            _transformedVertices = new Array<Vector>();
             _transformed = true;
 
             var _count : Int = _vertices.length;
 
-            for(i in 0..._count) {
-                _transformedVertices.push( _vertices[i].clone().transform( _transformMatrix ) );
+            if (_transformedVertices.length == _vertices.length) {
+                // Reuse the same transformed verticies.
+                for(i in 0..._count) {
+                    _transformedVertices[i].x = _transformMatrix.transformX(_vertices[i].x, _vertices[i].y);
+                    _transformedVertices[i].y = _transformMatrix.transformY(_vertices[i].x, _vertices[i].y);
+                }
+            } else {
+                for(i in 0..._count) {
+                    _transformedVertices.push( _vertices[i].transform( _transformMatrix ) );
+                }                                
             }
         }
 

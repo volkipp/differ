@@ -68,6 +68,16 @@ class Matrix  {
 
     } //makeTranslation
 
+    // Transforms the x portion of a Vector.
+    public function transformX(x :Float, y :Float) :Float {
+        return x * a + y * c + tx;
+    }
+
+    // Transforms the x portion of a Vector.
+    public function transformY(x :Float, y :Float) :Float {
+        return x * b + y * d + ty;
+    }
+
     public function rotate (angle:Float):Void {
 
         var cos = Math.cos (angle);
